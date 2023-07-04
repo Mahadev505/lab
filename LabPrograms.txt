@@ -1,0 +1,355 @@
+         Lab 8
+=====================================
+var http = require('http');
+var formidable = require('formidable');
+var fs = require('fs');
+var mv = require('mv');
+http.createServer(function (req, res) {
+ if (req.url == '/fileupload') {
+ var form = new formidable.IncomingForm();
+ form.parse(req, function (err, fields, files) {
+ var oldpath = files.filetoupload.filepath;
+ var newpath = 'g:/AWT PL/' + files.filetoupload.originalFilename;
+ console.log(oldpath);
+ res.write(oldpath);
+ res.write(newpath);
+ fs.copyFileSync(oldpath, newpath);
+
+ mv(oldpath,newpath, function(err) {
+ if (err) { throw err; }
+console.log('file moved successfully');
+res.write('File uploaded and moved!');
+res.end();
+});
+ /*fs.copyFileSync(oldpath, newpath, function (err) {
+ if (err) throw err;
+ res.write('File uploaded and moved!');
+ res.end();
+ }); */
+});
+ } else {
+ res.writeHead(200, {'Content-Type': 'text/html'});
+ res.write('<form action="fileupload" method="post" enctype="multipart/form-data">');
+res.write('<h1>FILE UPLOAD PROGRAM USING NODEJS</h1>');
+ res.write('<input type="file" name="filetoupload"><br>');
+ res.write('<br><input type="submit">');
+ res.write('</form>');
+ return res.end();
+ }
+}).listen(8092);
+
+
+          Lab 7
+======================================================
+const http = require('http');
+const mysql = require('mysql');
+
+console.log("7. Create a web page to fetch data from the database and display all students of MCA 2nd semester who have chosen AWT Course using Node.js\n");
+console.log("Server running at http://localhost:8090");
+console.log("Open the browser and type the URL specified here to fetch students who have opted for AWT Course");
+
+const con = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "",
+  database: "student"
+});
+
+http.createServer(function (req, res) {
+  con.connect(function (err) {
+    if (err) throw err;
+
+    con.query("SELECT * FROM Student WHERE Course ='AWT' AND Program = 'MCA' AND Sem = '2'", function (err, result) {
+      if (err) throw err;
+
+      res.writeHead(200, { 'Content-Type': 'text/html' });
+      res.write("7. Create a web page to fetch data from the database and display all students of MCA 2nd semester who have chosen AWT Course using Node.js\n");
+      res.write("<table border='1'><tr><th>USN</th><th>Name</th><th>Gender</th><th>Program</th><th>Semester</th><th>Course</th></tr>");
+      
+      for (var i = 0; i < result.length; i++) {
+        res.write("<tr><td>" + result[i].USN + "</td><td>" + result[i].Name + "</td><td>" + result[i].Gender + "</td><td>" + result[i].Program + "</td><td>" + result[i].Sem + "</td><td>" + result[i].Course + "</td></tr>");
+      }
+
+      res.write("</table>");
+      res.end();
+    });
+  });
+}).listen(2000);
+=============================================================
+
+DataBase
+================================================================
+
+
+===============================================================
+CREATE TABLE Student (
+  USN VARCHAR(10) PRIMARY KEY,
+  Name VARCHAR(100) NOT NULL,
+  Gender VARCHAR(10) NOT NULL,
+  Program VARCHAR(50) NOT NULL,
+  Course VARCHAR(50) NOT NULL,
+  Sem INT NOT NULL
+);
+===============================================================
+
+lab 6
+================================================================
+const http = require('http');
+const mysql = require('mysql');
+
+console.log("6. Design a web page to fetch the profile of a student from a MySQL database using Node.js");
+console.log("Server running at http://localhost:4000");
+console.log("Open the browser and type the URL specified here to fetch the student's profile");
+
+const con = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "",
+  database: "student"
+});
+
+http.createServer(function (req, res) {
+  con.connect(function (err) {
+    if (err) throw err;
+
+    con.query("SELECT * FROM Student WHERE USN = '21DMMCA029'", function (err, result) {
+      if (err) throw err;
+
+      res.writeHead(200, { 'Content-Type': 'text/html' });
+      res.write("6. Design a web page to fetch the profile of a student from a MySQL database using Node.js");
+      res.write("<br><br><table border=1 align=center width=50%>");
+      res.write("<caption> Profile of: " + result[0].Name + "</caption>");
+      res.write("<tr><td> USN </td><td>" + result[0].USN + "</td></tr>");
+      res.write("<tr><td> Name </td><td>" + result[0].Name + "</td></tr>");
+      res.write("<tr><td> Gender </td><td>" + result[0].Gender + "</td></tr>");
+      res.write("<tr><td> Program </td><td>" + result[0].Program + "</td></tr>");
+      res.write("<tr><td> Sem </td><td>" + result[0].Sem + "</td></tr>");
+      res.write("</table>");
+      res.end();
+    });
+  });
+}).listen(4000);
+
+
+
+
+======================================================================================================================================
+
+Lab5
+========================================================
+
+const http = require('http');
+const formidable = require('formidable');
+const mysql = require('mysql');
+
+console.log("5. Design a web page to register for an aspiring student to register for a program offered by the university using Node.js and MySQL database");
+console.log("Server running at http://localhost:8090");
+console.log("Open the browser and type the URL specified here to register the student");
+
+const con = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "",
+  database: "student"
+});
+
+http.createServer(function (req, res) {
+  if (req.url === '/register') {
+    const form = new formidable.IncomingForm();
+    form.parse(req, function (err, fields) {
+      con.connect(function (err) {
+        if (err) throw err;
+        const sql = "INSERT INTO Student (USN, Name, Gender, Program, Course, Sem) VALUES (?, ?, ?, ?, ?, ?)";
+        const values = [fields.txtusn, fields.txtname, fields.txtgender, fields.txtprogram, fields.txtcourse, fields.txtsem];
+
+        con.query(sql, values, function (err, result) {
+          if (err) throw err;
+          res.writeHead(200, { 'Content-Type': 'text/html' });
+          res.write("Registered Successfully" + "<a href='http://localhost:8090'> Click for new Registration </a>");
+          res.end();
+        });
+      });
+    });
+  } else {
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.write("5. Design a web page to register for an aspiring student to register for a program offered by the university using Node.js and MySQL database<hr>");
+    res.write('<form action="/register" method="post">');
+    res.write('USN: <input type="text" name="txtusn"><br>');
+    res.write('Name : <input type="text" name="txtname"><br>');
+    res.write('Gender : <input type="text" name="txtgender"><br>');
+    res.write('Program : <input type="text" name="txtprogram"><br>');
+    res.write('Semester : <input type="text" name="txtsem"><br>');
+    res.write('Course : <input type="text" name="txtcourse"><br>');
+    res.write('<input type="submit">');
+    res.write('</form>');
+    res.end();
+  }
+}).listen(8090);
+
+=================================================================
+lab 5
+==================================================================const http = require('http');
+const formidable = require('formidable');
+const mysql = require('mysql');
+
+console.log("5. Design a web page to register for an aspiring student to register for a program offered by the university using Node.js and MySQL database");
+console.log("Server running at http://localhost:8090");
+console.log("Open the browser and type the URL specified here to register the student");
+
+const con = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "",
+  database: "student"
+});
+
+http.createServer(function (req, res) {
+  if (req.url === '/register') {
+    const form = new formidable.IncomingForm();
+    form.parse(req, function (err, fields) {
+      con.connect(function (err) {
+        if (err) throw err;
+        const sql = "INSERT INTO Student (USN, Name, Gender, Program, Course, Sem) VALUES (?, ?, ?, ?, ?, ?)";
+        const values = [fields.txtusn, fields.txtname, fields.txtgender, fields.txtprogram, fields.txtcourse, fields.txtsem];
+
+        con.query(sql, values, function (err, result) {
+          if (err) throw err;
+          res.writeHead(200, { 'Content-Type': 'text/html' });
+          res.write("Registered Successfully" + "<a href='http://localhost:8090'> Click for new Registration </a>");
+          res.end();
+        });
+      });
+    });
+  } else {
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.write("5. Design a web page to register for an aspiring student to register for a program offered by the university using Node.js and MySQL database<hr>");
+    res.write('<form action="/register" method="post">');
+    res.write('USN: <input type="text" name="txtusn"><br>');
+    res.write('Name : <input type="text" name="txtname"><br>');
+    res.write('Gender : <input type="text" name="txtgender"><br>');
+    res.write('Program : <input type="text" name="txtprogram"><br>');
+    res.write('Semester : <input type="text" name="txtsem"><br>');
+    res.write('Course : <input type="text" name="txtcourse"><br>');
+    res.write('<input type="submit">');
+    res.write('</form>');
+    res.end();
+  }
+}).listen(8090);
+
+========================================================
+Lab 9
+===========================================================
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Web.Http;
+
+namespace webapisample.Controllers
+{
+    public class OddNumbersController : ApiController
+    {
+        public IEnumerable<int> Get(int n)
+        {
+            List<int> oddNumbers = new List<int>();
+            for (int i = 1; i <= n; i++)
+            {
+                if (i % 2 != 0)
+                {
+                    oddNumbers.Add(i);
+                }
+            }
+            return oddNumbers;
+        }
+    }
+}
+
+
+=======================================================
+Lab3
+===========================================================
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dynamic Table Creation</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    var jsonData = {
+      "Fruits": ["Apple", "Banana", "Orange"],
+      "Colors": ["Red", "Green", "Blue"],
+      "Animals": ["Lion", "Elephant", "Tiger"]
+    };
+
+    $(document).ready(function() {
+      $('#dropdown').change(function() {
+        var selectedValue = $(this).val();
+        var selectedData = jsonData[selectedValue];
+
+        var table = $('<table>');
+        $.each(selectedData, function(index, value) {
+          table.append($('<tr>').append($('<td>').text(value)));
+        });
+
+        $('#table-container').empty().append(table);
+      });
+    });
+  </script>
+</head>
+<body>
+  <h1>Dynamic Table Creation</h1>
+  <label for="dropdown">Select a category:</label>
+  <select id="dropdown">
+    <option value="Fruits">Fruits</option>
+    <option value="Colors">Colors</option>
+    <option value="Animals">Animals</option>
+  </select>
+
+  <div id="table-container"></div>
+</body>
+</html>
+
+
+===========================================================
+Lab3
+============================================================
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notepad</title>
+  <style>
+    body {
+      background-color: red;
+    }
+  </style>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      $("#btn").click(function() {
+        const title = $("#title").val();
+        const content = $("#mainarea").val();
+        const file = new Blob([content], { type: "text/plain" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(file);
+        link.download = title + ".txt";
+        link.click();
+        URL.revokeObjectURL(link.href);
+      });
+    });
+  </script>
+</head>
+<body>
+  <div class="container">
+    <label for="title">Title:</label>
+    <input id="title" type="text" placeholder="Give title" /><br><br>
+    <textarea id="mainarea" cols="60" rows="15"></textarea><br>
+    <button id="btn">Download</button>
+  </div>
+</body>
+</html>
+
+
+
