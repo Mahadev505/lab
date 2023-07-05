@@ -45,3 +45,30 @@ http.createServer(function (req, res) {
     res.end();
   }
 }).listen(8090);
+
+
+ /* 
+ CREATE TABLE Student (
+  USN VARCHAR(10) PRIMARY KEY,
+  Name VARCHAR(100) NOT NULL,
+  Gender VARCHAR(10) NOT NULL,
+  Program VARCHAR(50) NOT NULL,
+  Course VARCHAR(50) NOT NULL,
+  Sem INT NOT NULL
+
+  INSERT INTO Student (USN, Name, Gender, Program, Course, Sem)
+VALUES
+  ('21MMCA028', 'John Doe', 'Male', 'MCA', 'AWT', 1),
+  ('21MMCA029', 'Jane Smith', 'Female', 'MCA', 'AWT', 1),
+  ('21MMCA030', 'David Johnson', 'Male', 'MCA', 'AWT', 1),
+  ('21MMCA031', 'Emily Williams', 'Female', 'MCA', 'AWT', 1),
+  ('21MMCA032', 'Michael Brown', 'Male', 'MCA', 'AWT', 1),
+  ('21MMCA033', 'Sarah Davis', 'Female', 'MCA', 'AWT', 1),
+  ('21MMCA034', 'Robert Jones', 'Male', 'MCA', 'AWT', 1),
+  ('21MMCA035', 'Jessica Miller', 'Female', 'MCA', 'AWT', 1),
+  ('21MMCA036', 'Christopher Wilson', 'Male', 'MCA', 'AWT', 1),
+  ('21MMCA037', 'Amanda Taylor', 'Female', 'MCA', 'AWT', 1);
+
+);
+
+*/
